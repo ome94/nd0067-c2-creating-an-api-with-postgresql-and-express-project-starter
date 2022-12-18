@@ -16,7 +16,7 @@ const client = new Pool({
   port: PGPORT as (number|undefined),
   user: PGUSER,
   database: DBNAME,
-  password: PGPASSWORD,
+  password: PGPASSWORD
 });
 
 export default client;
