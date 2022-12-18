@@ -8,14 +8,16 @@ const {
   PGPORT,
   PGUSER,
   DBNAME,
-  PGPASSWORD
+  PGPASSWORD,
+  ENV,
+  TESTDB
 } = process.env;
 
 const client = new Pool({
   host: PGHOST,
   port: PGPORT as (number|undefined),
   user: PGUSER,
-  database: DBNAME,
+  database: (ENV == 'test' ? TESTDB : DBNAME),
   password: PGPASSWORD
 });
 
