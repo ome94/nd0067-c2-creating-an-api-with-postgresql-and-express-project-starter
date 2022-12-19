@@ -15,7 +15,7 @@ const {
 
 const client = new Pool({
   host: PGHOST,
-  port: PGPORT as (number|undefined),
+  port: PGPORT as unknown as (number|undefined),
   user: PGUSER,
   database: (ENV == 'test' ? TESTDB : DBNAME),
   password: PGPASSWORD
