@@ -22,6 +22,7 @@ export class FilmStore {
     const sql = `SELECT * FROM film`;
     const results = await conn.query(sql);
     
+    conn.release();
     return results.rows;
   }
 
@@ -30,6 +31,8 @@ export class FilmStore {
     const sql = `SELECT * FROM film
     WHERE film_id = $1`;
     const result = await conn.query(sql, [id]);
+    
+    conn.release();
     return result.rows[0];
   }
 

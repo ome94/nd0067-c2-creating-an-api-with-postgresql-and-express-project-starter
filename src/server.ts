@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express'
 import cors from 'cors';
 import bodyParser from 'body-parser'
 import films from './handlers/films';
+import books from './handlers/books';
+import auth from './handlers/auth';
 
 const app: express.Application = express()
 const address: string = "0.0.0.0:3000"
@@ -21,6 +23,8 @@ app.get('/', function (req: Request, res: Response) {
     res.send('Hello World!')
 })
 
+app.use('/users', auth);
+app.use('/books', books);
 app.use('/films', films);
 
 app.listen(3000, function () {
