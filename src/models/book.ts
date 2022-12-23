@@ -27,17 +27,21 @@ export class BookShelf {
 
     conn.release();
     return books.rows;
-  }
+  } 
 
-  async create(book: Book): Promise<Book> {
+  async create(book: Book): Promise<Book | void> {
     const sql = `INSERT INTO books(title, author_id, isbn, year)
     VALUES ($1, $2, $3, $4)`;
     const {title, isbn, year, author} = book;
-    const conn = await client.connect();
-    const books = await conn.query(sql, [title, author, isbn, year]);
+    try{
+      const conn = await client.connect();
+      const books = await conn.query(sql, [title, parseInt(author), isbn, year]);
+      conn.release();
+      return books.rows[0];
+    } catch(err) {
+      console.log(err);
+    }
     
-    conn.release();
-    return books.rows[0];
   }
 
 }
