@@ -20,8 +20,8 @@ export class UserRegistry {
     const result = (await conn.query(sql, [username])).rows;
     conn.release();
 
-    const user = result.length ? result[0] : null;
-    return bcrypt.compareSync(password+pepper, user.password) ? user : null;
+    const user: User | null = result.length ? <unknown>result[0] as User : null;
+    return bcrypt.compareSync(password+pepper, (user as User).password) ? user : null;
   }
 
   async index(): Promise<User[]> {

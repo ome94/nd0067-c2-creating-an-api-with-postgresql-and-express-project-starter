@@ -1,4 +1,6 @@
 import express, { Request, Response, Router } from "express";
+import jwt from "jsonwebtoken";
+
 import { UserRegistry } from "../models/user";
 
 const auth = Router();
@@ -18,8 +20,11 @@ const create = async (req: Request, res: Response) => {
 const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
   const user = await users.auth(username, password);
+  const token: string | null = user ? 
+                jwt.sign({ user: user }, <unknown>process.env.TOKEN_SECRET as string) :
+                JSON.stringify({error: "User not found"});
 
-  res.json(user);
+  res.json(token);
 }
 
 auth.route('/')
