@@ -3,7 +3,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser'
 import films from './handlers/films';
 import books from './handlers/books';
-import auth from './handlers/users';
+import auth from './handlers/users.routes';
 
 const app: express.Application = express()
 const address: string = "0.0.0.0:3000"
@@ -14,7 +14,7 @@ const corsOptions: cors.CorsOptions = {
 
 app.use(cors(corsOptions))
 app.use(bodyParser.json())
-app.use((req: Request, _res: Response, next: <T>() => void) => {
+app.use((req: Request, _res: Response, next: () => void) => {
     console.log(req.url);
     next();
 });
@@ -30,3 +30,5 @@ app.use('/films', films);
 app.listen(3000, function () {
     console.log(`starting app on: ${address}`)
 })
+
+export default app;
