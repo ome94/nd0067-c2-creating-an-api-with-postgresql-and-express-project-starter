@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 
 import client from "../database";
+import { userInfo } from 'os';
 
 const pepper = process.env.BCRYPT_PASSWORD;
 const saltRounds = parseInt(<unknown>process.env.SALT_NUM as string);
@@ -22,8 +23,8 @@ export class User {
         VALUES ($1, $2, $3, $4, $5)
         RETURNING *`;
     
-    user.password = bcrypt.hashSync(user.password+pepper, saltRounds);
-    const { username, password, firstname, lastname, status } = user;
+    const password = bcrypt.hashSync(user.password+pepper, saltRounds);
+    const { username, firstname, lastname, status } = user;
 
     const conn = await client.connect();
     const result = await conn.query(sql, [username, password, firstname, lastname, status]);
@@ -44,7 +45,10 @@ export class User {
     conn.release();
 
     const user = result ? result[0] : null;
-    return bcrypt.compareSync(password+pepper, user!.password) ? user : null;
+    
+    return user ? 
+           (bcrypt.compareSync(password+pepper, user.password) ? user : null) :
+            null;
   }
   
 
@@ -67,5 +71,16 @@ export class User {
     conn.release();
 
     return user;
+  }
+
+  async delete (username?: string) {
+    const sql = username ?
+      `DELETE FROM users WHERE username = $1` :
+      `DELETE FROM users`
+    ;
+    
+    const conn = await client.connect();
+    await conn.query(sql, username ? [username]: undefined);
+    conn.release();
   }
 }
