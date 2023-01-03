@@ -7,6 +7,7 @@ const pepper = process.env.BCRYPT_PASSWORD;
 const saltRounds = parseInt(<unknown>process.env.SALT_NUM as string);
 
 export type User = {
+  id?: number; 
   username: string;
   password: string;
   firstname?: string;
@@ -22,13 +23,16 @@ export class UserRegistry {
   async create(user: User): Promise<User> {
     const sql = `INSERT INTO 
         users(username, password, firstname, lastname, status)
-        VALUES ($1, $2, $3, $4, $5)`;
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *`;
     
     user.password = bcrypt.hashSync(user.password+pepper, saltRounds);
     const { username, password, firstname, lastname, status } = user;
 
     const conn = await client.connect();
-    await conn.query(sql, [username, password, firstname, lastname, status]);
+    const result = await conn.query(sql, [username, password, firstname, lastname, status]);
+    user = result.rows[0];
+    
     conn.release();
 
     return user;
@@ -43,8 +47,8 @@ export class UserRegistry {
     const result = (await conn.query(sql, [username])).rows;
     conn.release();
 
-    const user = result.length ? <User>result[0] : null;
-    return bcrypt.compareSync(password+pepper, (<User>user).password) ? user : null;
+    const user = result ? <User>result[0] : null;
+    return bcrypt.compareSync(password+pepper, user!.password) ? user : null;
   }
   
 
@@ -52,20 +56,20 @@ export class UserRegistry {
     const sql = `SELECT * FROM users`;
     
     const conn = await client.connect();
-    const users = await conn.query(sql);
+    const users = (await conn.query(sql)).rows;
     conn.release();
 
-    return users.rows;
+    return users;
   }
 
   
-  async show(username: string) {
+  async show(username: string): Promise<User> {
     const sql = `SELECT * FROM users WHERE username = $1`;
 
     const conn = await client.connect();
-    const results = await conn.query(sql, [username]);
+    const user = (await conn.query(sql, [username])).rows[0];
     conn.release();
 
-    return results.rows[0];
+    return user;
   }
 }

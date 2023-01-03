@@ -1,4 +1,4 @@
-import express, { Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import jwt from "jsonwebtoken";
 
 import { User, UserRegistry } from "../models/user";
@@ -9,14 +9,13 @@ const TOKEN_SECRET = <unknown>process.env.TOKEN_SECRET as string;
 const auth = Router();
 const users = new UserRegistry();
 
-const index = async (req: Request, res: Response) => {
+const index = async (_req: Request, res: Response) => {
   const allUsers = await users.index();
   res.json(allUsers);
 };
 
 const create = async (req: Request, res: Response) => {
-  const { username, password, firstname, lastname, status } = req.body;
-  const user = await users.create({username, password, firstname, lastname, status});
+  const user = await users.create(req.body);
   const token = jwt.sign(user, TOKEN_SECRET);
   res.set({Authorization: `Bearer ${token}`})
      .json(user);
