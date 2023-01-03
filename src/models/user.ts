@@ -1,12 +1,11 @@
 import bcrypt from 'bcrypt';
-import { JwtPayload } from "jsonwebtoken";
 
 import client from "../database";
 
 const pepper = process.env.BCRYPT_PASSWORD;
 const saltRounds = parseInt(<unknown>process.env.SALT_NUM as string);
 
-export type User = {
+export type UserInfo = {
   id?: number; 
   username: string;
   password: string;
@@ -15,12 +14,9 @@ export type User = {
   status?: string;
 }
 
-export interface UserPayload extends JwtPayload{
-  user?: User
-}
-export class UserRegistry {
+export class User {
 
-  async create(user: User): Promise<User> {
+  async create(user: UserInfo): Promise<UserInfo> {
     const sql = `INSERT INTO 
         users(username, password, firstname, lastname, status)
         VALUES ($1, $2, $3, $4, $5)
@@ -39,7 +35,7 @@ export class UserRegistry {
   }
 
 
-  async authenticate(username: string, password: string): Promise<User | null> {
+  async authenticate(username: string, password: string): Promise<UserInfo | null> {
     const sql = `SELECT * FROM users
         WHERE username = $1`;
 
@@ -47,12 +43,12 @@ export class UserRegistry {
     const result = (await conn.query(sql, [username])).rows;
     conn.release();
 
-    const user = result ? <User>result[0] : null;
+    const user = result ? result[0] : null;
     return bcrypt.compareSync(password+pepper, user!.password) ? user : null;
   }
   
 
-  async index(): Promise<User[]> {
+  async index(): Promise<UserInfo[]> {
     const sql = `SELECT * FROM users`;
     
     const conn = await client.connect();
@@ -63,7 +59,7 @@ export class UserRegistry {
   }
 
   
-  async show(username: string): Promise<User> {
+  async show(username: string): Promise<UserInfo> {
     const sql = `SELECT * FROM users WHERE username = $1`;
 
     const conn = await client.connect();
