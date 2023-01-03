@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.ts",
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node -r dotenv/config ./dist/server.js\"",
-    "test": "TESTDB=testDB && db-migrate db:create $TESTDB && db-migrate up --env test && ENV=test jasmine-ts; db-migrate db:drop $TESTDB",
+    "test": "TESTDB=testDB && db-migrate db:create $TESTDB && db-migrate up --env test && ENV=test jasmine-ts -r dotenv/config; db-migrate db:drop $TESTDB",
     "tsc": "tsc"
   },
   "author": "Udacity",
