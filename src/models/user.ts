@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 
 import client from "../database";
-import { userInfo } from 'os';
 
 const pepper = process.env.BCRYPT_PASSWORD;
 const saltRounds = parseInt(<unknown>process.env.SALT_NUM as string);

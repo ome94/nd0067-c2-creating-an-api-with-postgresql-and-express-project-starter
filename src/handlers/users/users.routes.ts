@@ -1,13 +1,14 @@
 import { Request, Response, Router } from "express";
 import jwt from "jsonwebtoken";
 
-import { User } from "../models/user";
-import { auth_admin, auth_user } from "./utils/authorize";
+import { User } from "../../models/user";
+import { authorize } from "./utils/authorize";
+import { checkExisting, validateInput } from "./utils/validate";
 
 const TOKEN_SECRET = <unknown>process.env.TOKEN_SECRET as string;
 
 const auth = Router();
-const users = new User();
+export const users = new User();
 
 const index = async (_req: Request, res: Response) => {
   const allUsers = await users.index();
@@ -17,19 +18,22 @@ const index = async (_req: Request, res: Response) => {
 const create = async (req: Request, res: Response) => {
   const user = await users.create(req.body);
   const token = jwt.sign(user, TOKEN_SECRET);
-  res.set({Authorization: `Bearer ${token}`})
+  res.status(201)
+     .set({Authorization: `Bearer ${token}`})
      .json(user);
 }
 
 const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
   
-  try{
+  try {
     const user = await users.authenticate(username, password);
-    const token: string = jwt.sign({ user: user }, TOKEN_SECRET);
+    const token: string = user ? jwt.sign({ user: user }, TOKEN_SECRET):'';
+    if(token)
+      res.set({Authorization: `Bearer ${token}`})
+         .json('Success! Logged in');
     
-    res.set({Authorization: `Bearer ${token}`})
-       .json('Success! Logged in');
+    else res.status(404).json('Error! Invalid user')
 
   } catch(err) {
     res.status(404)
@@ -49,11 +53,11 @@ const show = async (req: Request, res: Response) => {
 }
 
 auth.route('/')
-    .get(auth_admin, index)
-    .post(create);
+    .get(authorize('admin'), index)
+    .post(validateInput, checkExisting, create);
 
-auth.post('/auth', login);
+auth.post('/login', login);
 
-auth.get('/user/:username', auth_user, show);
+auth.get('/user/:username', authorize(), show);
 
 export default auth;

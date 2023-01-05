@@ -1,12 +1,13 @@
 import express, { Request, Response } from 'express'
 import cors from 'cors';
 import bodyParser from 'body-parser'
-import films from './handlers/films';
-import books from './handlers/books';
-import auth from './handlers/users.routes';
+import auth from './handlers/users/users.routes';
 
 const app: express.Application = express()
-const address: string = "0.0.0.0:3000"
+const port = process.env.ENV?.toLowerCase() === 'test' ? 
+              3001 : 3000;
+
+const address: string = `0.0.0.0:${port}`
 
 const corsOptions: cors.CorsOptions = {
     optionsSuccessStatus: 200
@@ -15,7 +16,7 @@ const corsOptions: cors.CorsOptions = {
 app.use(cors(corsOptions))
 app.use(bodyParser.json())
 app.use((req: Request, _res: Response, next: () => void) => {
-    console.log(req.url);
+    console.log(req.method, req.url);
     next();
 });
 
@@ -24,10 +25,8 @@ app.get('/', function (req: Request, res: Response) {
 })
 
 app.use('/users', auth);
-app.use('/books', books);
-app.use('/films', films);
 
-app.listen(3000, function () {
+app.listen(port, function () {
     console.log(`starting app on: ${address}`)
 })
 
