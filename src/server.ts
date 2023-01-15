@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import cors from 'cors';
 import bodyParser from 'body-parser'
 import auth from './handlers/users/users.routes';
+import products from './handlers/products/products.routes';
 
 const app: express.Application = express()
 const port = process.env.ENV?.toLowerCase() === 'test' ? 
@@ -25,6 +26,7 @@ app.get('/', function (req: Request, res: Response) {
 })
 
 app.use('/users', auth);
+app.use('/products', products)
 
 app.listen(port, function () {
     console.log(`starting app on: ${address}`)
