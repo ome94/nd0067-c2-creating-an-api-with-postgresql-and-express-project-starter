@@ -17,7 +17,7 @@ const index = async (_req: Request, res: Response) => {
 
 const create = async (req: Request, res: Response) => {
   const user = await users.create(req.body);
-  const token = jwt.sign(user, TOKEN_SECRET);
+  const token = jwt.sign({ user }, TOKEN_SECRET);
   res.status(201)
      .set({Authorization: `Bearer ${token}`})
      .json(user);
@@ -28,7 +28,7 @@ const login = async (req: Request, res: Response) => {
   
   try {
     const user = await users.authenticate(username, password);
-    const token: string = user ? jwt.sign({ user: user }, TOKEN_SECRET):'';
+    const token: string = user ? jwt.sign({ user }, TOKEN_SECRET):'';
     if(token)
       res.set({Authorization: `Bearer ${token}`})
          .json('Success! Logged in');

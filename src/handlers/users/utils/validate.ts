@@ -4,7 +4,6 @@ import { users } from "../users.routes";
 
 export const validateInput = (req: Request, res: Response, next: ()=>void) => {
   const { username, password } = req.body;
-  console.log()
   
   if (!username)
     res.status(400)
@@ -25,6 +24,6 @@ export const checkExisting = async (req: Request, res: Response, next: ()=>void)
     res.status(400)
       .json('Error! User already exists');
   
-  else next();    
+  else next();
 }
 
