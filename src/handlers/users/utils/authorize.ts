@@ -22,11 +22,15 @@ const authorize = (privilege?: 'user'|'admin') => {
           && user?.username)
         next();
 
-      else if (privilege !== 'admin'
+      else if (privilege === 'user' && user?.username)
+        next()
+
+      else if (privilege !== 'user'
           && (user?.username === username
               || user?.status === 'admin')
           )
         next();
+
       else
         res.status(403).json('Forbidden! User not authorized.');
 

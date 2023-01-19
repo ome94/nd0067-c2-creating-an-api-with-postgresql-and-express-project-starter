@@ -45,7 +45,7 @@ const show = async (req: Request, res: Response) => {
   const { username } = req.params;
   const user = await users.show(username);
   
-  if (user!.username === username)
+  if (user?.username === username)
     res.json(user);
   
   else
