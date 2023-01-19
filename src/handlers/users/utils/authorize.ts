@@ -43,4 +43,16 @@ const authorize = (privilege?: 'user'|'admin') => {
   return authorize;
 }
 
-export {authorize, UserPayload};
+const verify = (req: Request): number|void => {
+  const token = <unknown>req.headers.authorization?.split(' ')[1] as string;
+
+  try{
+    const { user } = jwt.verify(token, TOKEN_SECRET) as UserPayload
+    
+    return <number>user?.id;
+  }catch(err){
+    console.error(err);
+  }
+}
+
+export {authorize, verify, UserPayload};
