@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+
 import { ProductStore } from "../../models/product";
 import { authorize } from "../users/utils/authorize";
 import { validateProduct } from "./validate";
@@ -29,4 +30,5 @@ products.route('/')
   .post(authorize("admin"), validateProduct, create);
 
 products.get('/:id', show);
+
 export default products

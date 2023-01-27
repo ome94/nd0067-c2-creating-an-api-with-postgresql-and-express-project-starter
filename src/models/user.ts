@@ -74,8 +74,8 @@ export class User {
 
   async delete (username?: string) {
     const sql = username ?
-      `DELETE FROM users WHERE username = $1` :
-      `DELETE FROM users`
+      `DELETE FROM users WHERE username = $1 RETURNING *` :
+      `DELETE FROM users RETURNING *`
     ;
     
     const conn = await client.connect();
