@@ -51,7 +51,7 @@ const verify = (req: Request): number|void => {
     
     return <number>user?.id;
   }catch(err){
-    console.error(err);
+    console.error('Error! token cannot be verified');
   }
 }
 
