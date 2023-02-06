@@ -1,6 +1,8 @@
 import client from "../database";
 
-import { Order, OrderCard } from "../models/order";
+import { Order } from "../models/order";
+import { OrderBooking } from "../models/ordered-product";
+import { ProductStore } from "../models/product";
 
 export type OrderInfo = {
   order_id: number;
@@ -12,7 +14,9 @@ export type OrderInfo = {
   status: string;
 }
 
-const orders = new Order()
+const products = new ProductStore();
+const orders = new Order();
+const orderLog = new OrderBooking();
 
 export class OrderService {
   async index(): Promise<OrderInfo[]> {
@@ -49,13 +53,58 @@ export class OrderService {
 
   async currentOrder(userId: number): Promise<OrderInfo[]> {
     const { id } = await orders.showActive(userId) || {};
-    console.log(id);
     const results = id ? await this.show(id) : [];
 
     return results;
   }
 
-  async allOrders(): Promise<OrderCard[]> {
-    return await orders.index();
+  async addToCart(productId: number, userId: number, quantity: number=1):
+  Promise<OrderInfo> {
+    const { isNew, id } = await this.getActiveOrder(userId);
+    const orderItems = !isNew ? await this.show(id) : [];
+    const orderItem = orderItems.find(item => item.product_id === productId);
+    quantity += orderItem ? orderItem.quantity : 0;
+
+    const order = orderItem ? 
+        orderLog.addToOrder(id, productId, quantity):
+        orderLog.create(id, productId, quantity)
+    ;
+
+    let orderInfo: OrderInfo = await order.then(async (order) => {
+      const {name, price} = await products.show(productId);
+      const status = (await orders.show(id)).status as string;
+      
+      return {
+        ...order,
+        product: name,
+        price: price,
+        user_id: userId,
+        status: status || 'active'
+      }
+    });
+
+    return orderInfo;
+  }
+
+
+  async completeOrder(userId: number): Promise<OrderInfo[]> {
+    const currentOrder = await this.currentOrder(userId);
+    const order = await orders.checkout(userId)
+
+    currentOrder.forEach(ordr => ordr.status = <string>order.status)
+
+    return currentOrder;
+  }
+
+
+  private async getActiveOrder(userId: number): 
+  Promise<{ isNew: boolean; id: number }> {
+    // get active order_id
+    const order = await orders.showActive(userId);
+    // create an order if user has no active order
+    const { id } = order || await orders.create(userId)
+    const isNew = !order ? true : false;
+    
+    return { isNew, id: <number>id };
   }
 }
