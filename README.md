@@ -52,3 +52,55 @@ Add JWT functionality as shown in the course. Make sure that JWTs are required f
 Before submitting, make sure that your project is complete with a `README.md`. Your `README.md` must include instructions for setting up and running your project including how you setup, run, and connect to your database. 
 
 Before submitting your project, spin it up and test each endpoint. If each one responds with data that matches the data shapes from the `REQUIREMENTS.md`, it is ready for submission!
+
+
+## Instructions
+### 1. App Setup
+- Create a file in the project root named **`.env`** file. That is, at the same level as the **`src`** or **`package.json`** file.
+- In the **`.env`** file, create the following variables:
+  >**PGHOST**: url of the postgres database server.
+
+  >**PGPORT**: port on which the postgres server listens.
+
+  >**PGUSER**: postgres username for the app.
+
+  >**DBNAME** : database name for the app.
+
+  >**TESTDB**: database name set for testing purposes.
+
+  >**PGPASSWORD**: secret password for logging into the postgres db server.
+
+  >**ENV**: environment on which the app is running.
+
+  >**BCRYPT_PASSWORD**: secret password for creating hash strings of user passwords.
+
+  >**SALT_NUM**: salt number for hashing passwords.
+
+  >**TOKEN_SECRET**: secret password for signing and verifying JSON web tokens.
+- Create database credentials corresponding with the values set in the **`.env`** file.
+- Ensure that all necessary privileges are given to the created **`PGUSER`**  on the created database for the app. The line below can help with that.
+```
+GRANT ALL PRIVILEGES ON DATABASE <DBNAME> TO <PGUSER>
+```
+- Install the app dependencies by running
+```
+npm install 
+```
+- Create the table migrations by running 
+```
+npx db-migrate
+```
+### 2. Running the app
+- the line below runs the app in a development server mode
+```
+npm run watch
+```
+- To run a production ready version of our app, the  project has to be transpiled using the following:
+```
+npm tsc
+```
+This will transpile the project files from TypeScript to JavaScript.
+- The line below runs the app in a production server mode
+```
+npm start
+```
