@@ -25,6 +25,17 @@ export class Order {
     return result
   }
 
+  async show(orderId: number): Promise<OrderCard> {
+    const sql = `SELECT * FROM orders
+        WHERE order_id = $1`
+
+    const conn = await client.connect();
+    const result = (await conn.query(sql, [orderId])).rows[0];
+    conn.release();
+
+    return result;
+  }
+
   async showActive(userId: number): Promise<OrderCard> {
     const sql = `
       SELECT * FROM orders 
