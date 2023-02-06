@@ -27,7 +27,7 @@ export class Order {
 
   async show(orderId: number): Promise<OrderCard> {
     const sql = `SELECT * FROM orders
-        WHERE order_id = $1`
+        WHERE id = $1`
 
     const conn = await client.connect();
     const result = (await conn.query(sql, [orderId])).rows[0];
@@ -65,4 +65,16 @@ export class Order {
     
     return result;
   }
+
+  async delete (orderId?: string) {
+    const sql = orderId ?
+      `DELETE FROM orders WHERE id = $1 RETURNING *` :
+      `DELETE FROM orders RETURNING *`
+    ;
+    
+    const conn = await client.connect();
+    await conn.query(sql, orderId ? [orderId]: undefined);
+    conn.release();
+  }
+
 }
