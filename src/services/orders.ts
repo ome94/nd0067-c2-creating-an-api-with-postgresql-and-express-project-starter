@@ -63,7 +63,7 @@ export class OrderService {
     const { isNew, id } = await this.getActiveOrder(userId);
     const orderItems = !isNew ? await this.show(id) : [];
     const orderItem = orderItems.find(item => item.product_id === productId);
-    quantity += orderItem ? orderItem.quantity : 0;
+    quantity = orderItem ? orderItem.quantity : quantity;
 
     const order = orderItem ? 
         orderLog.addToOrder(id, productId, quantity):

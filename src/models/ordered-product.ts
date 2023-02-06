@@ -42,7 +42,7 @@ export class OrderBooking {
 
   async addToOrder(orderId: number, productId: number, quantity: number=1):
     Promise<OrderItem> {
-    const sql = `UPDATE ordered_products SET quantity = $3
+    const sql = `UPDATE ordered_products SET quantity = quantity+$3
               WHERE order_id = $1 AND product_id = $2
               RETURNING *`
     ;
@@ -52,5 +52,16 @@ export class OrderBooking {
     conn.release();
 
     return result;
+  }
+
+  async delete (orderId?: string) {
+    const sql = orderId ?
+    `DELETE FROM ordered_products WHERE order_id = $1 RETURNING *` :
+    `DELETE FROM ordered_products RETURNING *`
+    ;
+    
+    const conn = await client.connect();
+    await conn.query(sql, orderId ? [orderId]: undefined);
+    conn.release();
   }
 }
