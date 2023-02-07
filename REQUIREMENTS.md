@@ -4,6 +4,7 @@ The company stakeholders want to create an online storefront to showcase their g
 These are the notes from a meeting with the frontend developer that describe what endpoints the API needs to supply, as well as data shapes the frontend and backend have agreed meet the requirements of the application. 
 
 ## API Endpoints
+Authorization of JWT tokens is done by the [**`authorize.ts`**](./src/handlers/users/utils/authorize.ts) middleware.
 #### Products
 - Index
 > `GET /products` 
@@ -23,7 +24,7 @@ These are the notes from a meeting with the frontend developer that describe wha
 > `POST /users`
 
 #### Orders
-- Current Order by user (args: user id)[token required]
+- Current Order by user (args: user id)[token required] (User ID is obtained from a verified JWT)
 > `GET /orders/cart`
 - [OPTIONAL] Completed Orders by user (args: user id)[token required]
 

@@ -63,10 +63,10 @@ const checkout = async (req: Request, res: Response) => {
 
 orders.route('/')
     .get(authorize('admin'), index)
-    .post(authorize('user'), addProduct);
+    .post(addProduct);
 
-orders.get('/cart', authorize('user'), cart)
-orders.put('/checkout', authorize('user'), checkout);
-orders.get('/:id', authorize('user'), show);
+orders.get('/cart', cart)
+orders.put('/checkout', checkout);
+orders.get('/:id', show);
 
 export default orders;

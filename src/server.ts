@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import auth from './handlers/users/users.routes';
 import products from './handlers/products/products.routes';
 import orders from './handlers/orders/orders.routes';
+import { authorize } from './handlers/users/utils/authorize';
 
 const app: express.Application = express()
 const port = process.env.ENV?.toLowerCase() === 'test' ? 
@@ -29,7 +30,7 @@ app.get('/', function (req: Request, res: Response) {
 
 app.use('/users', auth);
 app.use('/products', products);
-app.use('/orders', orders);
+app.use('/orders', authorize('user'), orders);
 
 app.listen(port, function () {
     console.log(`starting app on: ${address}`)
