@@ -126,7 +126,7 @@ describe('Test Orders route', () => {
   describe('Test GET /orders/checkout', () => {
     describe('Test unauthenticated request', () => {
       it('Expects 401 response for unauthenticated request', async () => {
-        const response = await request.get('/orders/checkout');
+        const response = await request.put('/orders/checkout');
         expect(response.status).toBe(401)
       });
     });
@@ -135,7 +135,7 @@ describe('Test Orders route', () => {
       beforeAll(async () => token = await login(user));
       
       it('Expects 200 response for authenticated request', async () => {
-        const response = await request.get('/orders/checkout')
+        const response = await request.put('/orders/checkout')
                                       .set({authorization: token});
         ;
         expect(response.status).toBe(200);

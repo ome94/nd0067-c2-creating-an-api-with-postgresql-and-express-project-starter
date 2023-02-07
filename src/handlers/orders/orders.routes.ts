@@ -60,7 +60,7 @@ orders.route('/')
     .post(authorize('user'), addProduct);
 
 orders.get('/cart', authorize('user'), cart)
-orders.get('/checkout', authorize('user'), checkout);
+orders.put('/checkout', authorize('user'), checkout);
 orders.get('/:id', authorize('user'), show);
 
 export default orders;
