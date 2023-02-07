@@ -55,7 +55,7 @@ describe('Test OrderBooking model (ordered_products table)', () => {
 
     it('Expects created row to be returned', async () => {
       const result = await orderLog.create(<number>order.id, <number>product.id);
-      expect(parseInt(<unknown>result.order_id as string)).toBe(<number>order.id);
+      expect(result.order_id).toBe(<number>order.id);
     });
   });
 
@@ -75,7 +75,7 @@ describe('Test OrderBooking model (ordered_products table)', () => {
     });
     
     it('Expects returned rows to have the specified order_id',async () => {
-      expect(results.every(ord => parseInt(ord.order_id.toString()) === order.id)).toBeTrue();
+      expect(results.every(ord => ord.order_id === order.id)).toBeTrue();
     });
   });
 
