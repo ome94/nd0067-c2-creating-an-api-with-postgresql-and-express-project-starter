@@ -9,20 +9,30 @@ export const store = new ProductStore();
 const products = Router();
 
 const index = async (_req: Request, res: Response) => {
-  const allProducts = await store.index();
-  res.json(allProducts);
+  try{
+    const allProducts = await store.index();
+    res.json(allProducts);
+  } catch(err){
+      res.status(500).json(err);
+  }
 }
 
 const show = async (req: Request, res: Response) => {
-  const product = await store.show(<unknown>req.params.id as number);
-  
-  res.status(200).json(product);
+  try{
+    const product = await store.show(<unknown>req.params.id as number);
+    res.status(200).json(product);
+  } catch(err){
+      res.status(500).json(err);
+  }
 }
 
 const create = async (req: Request, res: Response) => {
-  const product = await store.create({...req.body});
-
-  res.status(201).json(product);
+  try {
+    const product = await store.create({...req.body});
+    res.status(201).json(product);
+  } catch (err) {
+      res.status(500).json(err);
+  }
 }
 
 products.route('/')

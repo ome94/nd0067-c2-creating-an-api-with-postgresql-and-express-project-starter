@@ -11,16 +11,24 @@ const auth = Router();
 export const users = new User();
 
 const index = async (_req: Request, res: Response) => {
-  const allUsers = await users.index();
-  res.json(allUsers);
+  try {
+    const allUsers = await users.index();
+    res.json(allUsers);
+  } catch (err) {
+      res.status(500).json(err);
+  }
 };
 
 const create = async (req: Request, res: Response) => {
-  const user = await users.create(req.body);
-  const token = jwt.sign({ user }, TOKEN_SECRET);
-  res.status(201)
-     .set({Authorization: `Bearer ${token}`})
-     .json(user);
+  try {
+    const user = await users.create(req.body);
+    const token = jwt.sign({ user }, TOKEN_SECRET);
+    res.status(201)
+       .set({Authorization: `Bearer ${token}`})
+       .json(user);
+  } catch (err) {
+    res.status(500).json(err);    
+  }
 }
 
 const login = async (req: Request, res: Response) => {
@@ -43,13 +51,18 @@ const login = async (req: Request, res: Response) => {
 
 const show = async (req: Request, res: Response) => {
   const { username } = req.params;
-  const user = await users.show(username);
-  
-  if (user?.username === username)
-    res.json(user);
-  
-  else
-    res.status(403).json('Forbidden!');
+  try {
+    const user = await users.show(username);
+    
+    if (user?.username === username)
+      res.json(user);
+    
+    else
+      res.status(403).json('Forbidden!');
+      
+  } catch (err) {
+      res.status(500).json(err);
+  }
 }
 
 auth.route('/')

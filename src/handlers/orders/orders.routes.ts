@@ -8,16 +8,22 @@ const orders = Router();
 const carts = new OrderService()
 
 const index = async (_req: Request, res: Response) => {
-  const allOrders = await carts.index();
-
-  res.status(200).json(allOrders);
+  try{
+    const allOrders = await carts.index();
+    res.status(200).json(allOrders);
+  } catch(err){
+      res.status(500).json(err);
+  }
 }
 
 const show = async (req: Request, res: Response) => {
-  const orderId = parseInt(req.params.id);
-  const order = await carts.show(orderId);
-
-  res.status(200).json(order);
+  try{
+    const orderId = parseInt(req.params.id);
+    const order = await carts.show(orderId);
+    res.status(200).json(order);
+  } catch(err){
+    res.status(500).json(err);
+  }
 }
 
 const addProduct = async (req: Request, res: Response) => {
