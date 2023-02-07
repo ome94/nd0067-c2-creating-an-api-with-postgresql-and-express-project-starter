@@ -58,29 +58,66 @@ Before submitting your project, spin it up and test each endpoint. If each one r
 ### 1. App Setup
 - Create a file in the project root named **`.env`** file. That is, at the same level as the **`src`** or **`package.json`** file.
 - In the **`.env`** file, create the following variables:
-  >**PGHOST**: url of the postgres database server.
+>**PGHOST**: URL of the postgres database server. If the database server runs on the local computer, then:
+```
+PGHOST=localhost
+```
 
-  >**PGPORT**: port on which the postgres server listens.
+  >**PGPORT**: port on which the postgres server listens. The default port on which postgres db runs is  `5432`. Thus: 
+```
+PGPORT=5432
+```
+  >**PGUSER**: postgres username for the app. A database user may be created for the app by logging into a `psql` terminal as a postgres super user and executing the following line:
+```
+CREATE USER store_api WITH PASSWORD store_api_password;
+```
+  Now we can set the  **`PGUSER`** as `store_api` as such:
+```
+PGUSER=store_api
+```
 
-  >**PGUSER**: postgres username for the app.
+  >**DBNAME** : database name for the app. A database may be created for the app by executing:
+```
+CREATE DATABASE superstore;
+``` 
 
-  >**DBNAME** : database name for the app.
+  >**TESTDB**: database name set for testing purposes. Another database may be created for testing purposes by executing:
+```
+CREATE DATABASE superstore_test_db;
+```
+  However, a test database is created with `db-migrate` with the npm test script:
+```
+"test": "TESTDB=testDB && db-migrate db:create $TESTDB && db-migrate up --env test && ENV=test jasmine-ts -r dotenv/config; db-migrate db:drop $TESTDB"
+```
 
-  >**TESTDB**: database name set for testing purposes.
+  >**PGPASSWORD**: secret password for logging into the postgres db server as a database user. The password for the `store_api` user created above is `store_api_password`, so we can set the **`PGPASSWORD`** as `store_api_password`, that is:
+```
+PGPASSWORD=store_api_password
+```
 
-  >**PGPASSWORD**: secret password for logging into the postgres db server.
-
-  >**ENV**: environment on which the app is running.
+  >**ENV**: environment on which the app is running. This variable is important for selecting which database to connect with. The database connection script `src/database.ts` selects the database based on the **`ENV`** variable. The port on which the server listens for requests also depends on the **`ENV`** variable as well(port 3001 for `test` env and port 3000 otherwise). The connection port is selected in the `src/server/ts`. So the **`ENV`** variable can be set as test or development, production, etc
+```
+ENV=test
+```
+  or
+```
+ENV=development
+```
 
   >**BCRYPT_PASSWORD**: secret password for creating hash strings of user passwords.
 
   >**SALT_NUM**: salt number for hashing passwords.
 
   >**TOKEN_SECRET**: secret password for signing and verifying JSON web tokens.
+
 - Create database credentials corresponding with the values set in the **`.env`** file.
-- Ensure that all necessary privileges are given to the created **`PGUSER`**  on the created database for the app. The line below can help with that.
+- Ensure that all necessary privileges are given to the created **`PGUSER`**  on the created database for the app. This can be done by executing the following as a postgres super user from a `psql` terminal.
 ```
 GRANT ALL PRIVILEGES ON DATABASE <DBNAME> TO <PGUSER>
+```
+That is, for example
+```
+GRANT ALL PRIVILEGES ON DATABASE superstore TO store_api;
 ```
 - Install the app dependencies by running
 ```
@@ -104,3 +141,32 @@ This will transpile the project files from TypeScript to JavaScript.
 ```
 npm start
 ```
+### 3. Endpoints
+The following endpoints are available on the api:
+#### Users routes
+- Users index route accessible only to a logged in admin user.
+> `GET /users`
+- Create user route. Payload requires at least a non existing username and password to create new user.
+> `POST /users`
+- Authenticate/ login route. Payload requires an existing username and a corresponding password to authenticate user and generate a JWT
+> `POST /users/login`
+- Show user route. Requires a valid `username` as a URL parameter.
+> `GET /users/user/:username`
+#### Products routes
+- Products index route.
+> `GET /products`
+- Create product route. Requires at least a product name and price in the request body. Accessible only to a logged in admin user.
+> `POST /products`
+- Show product route. Requires a valid product `id` as a URL parameter.
+> `GET /products/:id`
+#### Orders routes
+- Orders index. Accessible only to a logged in admin user.
+> `GET /orders`
+- Create order. Accessible to any logged in user. The request body requires at leat a valid product `id`.
+> `POST /orders`
+- Show active order by user. Accessible to any logged in user.
+> `GET /orders/cart`
+- Checkout active order.
+> `PUT /orders/checkout`
+- Show order. Accessible to any logged in user. Requires a valid order `id` as a URL parameter.
+> `GET /orders/:id`
